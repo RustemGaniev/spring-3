@@ -2,19 +2,23 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.util.*;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 
 public class MyRunnable implements Runnable {
 
     public static final String GET = "GET";
     public static final String POST = "POST";
+    public static final int port = 9999;
     @Override
 
     public void run() {
 
                 final var allowedMethods = List.of(GET, POST);
 
-                try (final var serverSocket = new ServerSocket(9999)) {
+                try (final var serverSocket = new ServerSocket(port)) {
                     while (true) {
                         try (
                                 final var socket = serverSocket.accept();
@@ -42,15 +46,6 @@ public class MyRunnable implements Runnable {
                                 badRequest(out);
                                 continue;
                             }
-// начинаю парсить строку запроса
-
-                            System.out.println(URLEncodedUtils.getQueryParam(requestLine));
-                            System.out.println(URLEncodedUtils.getQueryParams(requestLine));
-
-
-                            // закончил парсить
-
-
 
                             final var method = requestLine[0];
                             if (!allowedMethods.contains(method)) {
@@ -65,6 +60,11 @@ public class MyRunnable implements Runnable {
                                 continue;
                             }
                             System.out.println(path);
+
+
+                            // начинаю парсить с помощью URLEncodedUtils
+                            System.out.println(URLEncodedUtils.parse(URI.create(path), "UTF-8"));
+
 
                             // ищем заголовки
                             final var headersDelimiter = new byte[]{'\r', '\n', '\r', '\n'};
